@@ -1,0 +1,41 @@
+# Java
+target/
+*.class
+*.jar
+*.war
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.project/
+.classpath/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# 配置文件（含敏感信息）
+application-local.yml
+.env
+*.key
+*.pem
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
+logs/

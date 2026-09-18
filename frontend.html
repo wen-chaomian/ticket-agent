@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能工单决策系统</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 50%, #FFE082 100%);
+  min-height: 100vh;
+  color: #3E2723;
+}
+
+/* 顶部导航 */
+.navbar {
+  background: linear-gradient(135deg, #FFD54F 0%, #FFCA28 100%);
+  box-shadow: 0 2px 12px rgba(255, 193, 7, 0.3);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  height: 64px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.navbar .logo {
+  font-size: 20px;
+  font-weight: 800;
+  color: #5D4037;
+  margin-right: 48px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.navbar .logo .mascot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.nav-tabs { display: flex; gap: 6px; }
+.nav-tab {
+  padding: 10px 24px;
+  border-radius: 24px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #6D4C41;
+  border: none;
+  background: transparent;
+  transition: all .25s;
+  font-weight: 500;
+}
+.nav-tab:hover { background: rgba(255,255,255,0.5); }
+.nav-tab.active {
+  background: #fff;
+  color: #E65100;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* 主容器 */
+.container {
+  max-width: 1080px;
+  margin: 32px auto;
+  padding: 0 24px;
+}
+.page { display: none; }
+.page.active { display: block; }
+
+/* 欢迎横幅 */
+.hero-banner {
+  background: linear-gradient(135deg, #FFF9C4 0%, #FFF176 100%);
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 20px rgba(255, 193, 7, 0.2);
+}
+.hero-banner h1 {
+  font-size: 26px;
+  color: #E65100;
+  margin-bottom: 8px;
+}
+.hero-banner p {
+  font-size: 14px;
+  color: #795548;
+  line-height: 1.6;
+}
+.hero-banner .mascot-big {
+  width: 120px;
+  height: 120px;
+  border-radius: 24px;
+  object-fit: cover;
+  margin-left: 24px;
+  animation: bounce 2s ease-in-out infinite;
+  box-shadow: 0 8px 24px rgba(255, 143, 0, 0.3);
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* 统计卡片 */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  transition: transform .2s;
+}
+.stat-card:hover { transform: translateY(-2px); }
+.stat-card .stat-icon { font-size: 28px; margin-bottom: 8px; }
+.stat-card .stat-num { font-size: 24px; font-weight: 800; color: #E65100; }
+.stat-card .stat-label { font-size: 12px; color: #8D6E63; margin-top: 4px; }
+
+/* 卡片 */
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  margin-bottom: 20px;
+}
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #FFF8E1;
+  color: #5D4037;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 表单 */
+.form-group { margin-bottom: 20px; }
+.form-group label {
+  display: block;
+  font-size: 13px;
+  color: #5D4037;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.form-group label .required { color: #FF5722; margin-left: 2px; }
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #FFE082;
+  border-radius: 12px;
+  font-size: 14px;
+  transition: all .2s;
+  font-family: inherit;
+  background: #FFFDE7;
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #FFB300;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 179, 0, 0.15);
+}
+.form-group textarea { resize: vertical; min-height: 120px; }
+.form-row { display: flex; gap: 16px; }
+.form-row .form-group { flex: 1; }
+
+/* 按钮 */
+.btn {
+  padding: 12px 32px;
+  border: none;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #FFB300 0%, #FF8F00 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(255, 143, 0, 0.3);
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(255, 143, 0, 0.4);
+}
+.btn-primary:disabled {
+  background: #FFE082;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.btn-success {
+  background: linear-gradient(135deg, #66BB6A 0%, #43A047 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(67, 160, 71, 0.3);
+}
+.btn-success:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(67, 160, 71, 0.4);
+}
+.btn-default {
+  background: #fff;
+  color: #5D4037;
+  border: 2px solid #FFE082;
+}
+.btn-default:hover { border-color: #FFB300; color: #E65100; }
+.btn:disabled { opacity: .5; cursor: not-allowed; transform: none !important; }
+
+/* 状态标签 */
+.status-tag {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.status-1 { background: #EFEBE9; color: #5D4037; }
+.status-2 { background: #E3F2FD; color: #1565C0; }
+.status-3 { background: #FFF8E1; color: #F57F17; }
+.status-4 { background: #E8F5E9; color: #2E7D32; }
+.status-6 { background: #FFEBEE; color: #C62828; }
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #8D6E63;
+}
+.empty-state .icon { font-size: 56px; margin-bottom: 16px; }
+.empty-state p { font-size: 14px; }
+
+/* 加载动画 */
+.loading {
+  display: inline-block;
+  width: 18px; height: 18px;
+  border: 3px solid #FFF8E1;
+  border-top-color: #FF8F00;
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* AI 结果区 */
+.ai-section {
+  background: linear-gradient(135deg, #FFFDE7 0%, #FFF9C4 100%);
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 16px;
+  border: 1px solid #FFF59D;
+}
+.ai-row {
+  display: flex;
+  padding: 10px 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.ai-row .label {
+  width: 90px;
+  color: #8D6E63;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+.ai-row .value { color: #3E2723; flex: 1; }
+.confidence-bar {
+  display: inline-block;
+  width: 140px;
+  height: 8px;
+  background: #FFF9C4;
+  border-radius: 4px;
+  overflow: hidden;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+.confidence-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FFB300, #FF8F00);
+  border-radius: 4px;
+}
+
+/* 方案选项 */
+.option-item {
+  border: 2px solid #FFE082;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: all .2s;
+  font-size: 13px;
+  background: #fff;
+}
+.option-item:hover {
+  border-color: #FFB300;
+  background: #FFFDE7;
+  transform: translateX(4px);
+}
+.option-item.selected {
+  border-color: #FF8F00;
+  background: #FFF8E1;
+  box-shadow: 0 4px 12px rgba(255, 143, 0, 0.15);
+}
+.option-item .option-title { font-weight: 700; margin-bottom: 4px; color: #E65100; }
+.option-item .option-desc { color: #795548; font-size: 12px; }
+
+/* 成功提示 */
+.success-banner {
+  background: #E8F5E9;
+  border: 1px solid #A5D6A7;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #2E7D32;
+}
+.success-banner a {
+  color: #FF8F00;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-left: 8px;
+  font-weight: 600;
+}
+
+/* 错误提示 */
+.error-banner {
+  background: #FFEBEE;
+  border: 1px solid #EF9A9A;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #C62828;
+}
+
+/* 工单号查询行 */
+.search-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.search-row input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #FFE082;
+  border-radius: 24px;
+  font-size: 14px;
+  background: #FFFDE7;
+}
+.search-row input:focus {
+  outline: none;
+  border-color: #FFB300;
+  background: #fff;
+}
+
+/* 详情区 */
+.detail-section { margin-top: 20px; }
+.detail-section h4 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #5D4037;
+}
+.solution-box {
+  background: #E8F5E9;
+  border: 1px solid #A5D6A7;
+  border-radius: 12px;
+  padding: 18px;
+  font-size: 14px;
+  color: #2E7D32;
+  line-height: 1.6;
+}
+.error-box {
+  background: #FFEBEE;
+  border: 1px solid #EF9A9A;
+  border-radius: 12px;
+  padding: 18px;
+  font-size: 14px;
+  color: #C62828;
+}
+
+/* 底部说明 */
+.footer-tips {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+}
+.tip-card {
+  background: rgba(255,255,255,0.7);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+}
+.tip-card .tip-icon { font-size: 32px; margin-bottom: 8px; }
+.tip-card .tip-title { font-size: 14px; font-weight: 700; color: #E65100; margin-bottom: 6px; }
+.tip-card .tip-desc { font-size: 12px; color: #8D6E63; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<div class="navbar">
+  <div class="logo">
+    <img src="mascot.jpg" class="mascot" alt="mascot">
+    智能工单决策系统
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-page="submit" onclick="switchPage('submit')">📝 提交工单</button>
+    <button class="nav-tab" data-page="track" onclick="switchPage('track')">🔍 工单跟踪</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ========== 页面一：提交工单 ========== -->
+  <div class="page active" id="page-submit">
+
+    <!-- 欢迎横幅 -->
+    <div class="hero-banner">
+      <div>
+        <h1>你好呀！🐥</h1>
+        <p>遇到问题了？提交工单，AI 助手会帮你智能分析并推荐解决方案。<br>
+        描述越详细，AI 判断越准确，处理越快哦~</p>
+      </div>
+      <img src="mascot.jpg" class="mascot-big" alt="mascot">
+    </div>
+
+    <!-- 统计卡片 -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📨</div>
+        <div class="stat-num">今日已处理</div>
+        <div class="stat-label">智能工单总数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🤖</div>
+        <div class="stat-num">85%</div>
+        <div class="stat-label">AI 自动解决率</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-num">3分钟</div>
+        <div class="stat-label">平均响应时间</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">😊</div>
+        <div class="stat-num">98%</div>
+        <div class="stat-label">用户满意度</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📝 提交新工单</div>
+      <div id="submitSuccess" style="display:none;">
+        <div class="success-banner">
+          🎉 工单提交成功！
+          <a onclick="goTrack()">点击去跟踪工单状态 →</a>
+        </div>
+      </div>
+      <form id="submitForm" onsubmit="submitTicket(event)">
+        <div class="form-group">
+          <label>工单标题<span class="required">*</span></label>
+          <input type="text" id="title" placeholder="简要描述遇到的问题，如：无法登录系统" required>
+        </div>
+        <div class="form-group">
+          <label>问题描述<span class="required">*</span></label>
+          <textarea id="description" placeholder="详细描述问题现象、发生时间、复现步骤...&#10;描述越详细，AI 分析越准确哦~" required></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>优先级</label>
+            <select id="priority">
+              <option value="1">🟡 普通</option>
+              <option value="2">🟠 紧急</option>
+              <option value="3">🔴 特急</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>提交人 ID</label>
+            <input type="text" id="submitterId" value="user001">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" id="submitBtn">🚀 提交工单</button>
+      </form>
+    </div>
+
+    <!-- 底部小贴士 -->
+    <div class="footer-tips">
+      <div class="tip-card">
+        <div class="tip-icon">💡</div>
+        <div class="tip-title">描述要详细</div>
+        <div class="tip-desc">写清楚问题现象、发生时间、复现步骤，AI 才能更准确地判断</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">⚙️</div>
+        <div class="tip-title">AI 智能分析</div>
+        <div class="tip-desc">提交后 AI 会自动分类、生成解决方案，高置信度自动处理</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">👤</div>
+        <div class="tip-title">人工兜底</div>
+        <div class="tip-desc">AI 不确定时会推荐多个方案，等待人工确认后处理</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========== 页面二：工单跟踪 ========== -->
+  <div class="page" id="page-track">
+    <div class="card">
+      <div class="card-title">🔍 查询工单状态</div>
+      <div class="search-row">
+        <input type="text" id="ticketNoInput" placeholder="输入工单号，如 T20260918123456789">
+        <button class="btn btn-primary" onclick="queryTicket()">查询</button>
+      </div>
+      <div id="trackResult"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API_BASE = 'http://localhost:8080/api/ticket';
+let pollTimer = null;
+let currentTicketNo = '';
+
+// 页面切换
+function switchPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelector(`.nav-tab[data-page="${page}"]`).classList.add('active');
+  if (page !== 'track') stopPolling();
+}
+
+function goTrack() {
+  switchPage('track');
+}
+
+// ========== 提交工单 ==========
+async function submitTicket(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '提交中...';
+
+  const body = {
+    title: document.getElementById('title').value,
+    description: document.getElementById('description').value,
+    priority: parseInt(document.getElementById('priority').value),
+    submitterId: document.getElementById('submitterId').value
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const result = await res.json();
+    if (result.code === 200) {
+      const ticket = result.data;
+      document.getElementById('submitSuccess').style.display = 'block';
+      document.getElementById('ticketNoInput').value = ticket.ticketNo;
+      document.getElementById('submitForm').reset();
+      setTimeout(() => {
+        goTrack();
+        startPolling(ticket.ticketNo);
+      }, 800);
+    } else {
+      alert('提交失败：' + result.message);
+    }
+  } catch (err) {
+    alert('网络错误：' + err.message + '\n请确认后端服务已启动（localhost:8080）');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🚀 提交工单';
+  }
+}
+
+// ========== 查询工单 ==========
+async function queryTicket() {
+  const ticketNo = document.getElementById('ticketNoInput').value.trim();
+  if (!ticketNo) { alert('请输入工单号'); return; }
+  stopPolling();
+  startPolling(ticketNo);
+}
+
+function startPolling(ticketNo) {
+  currentTicketNo = ticketNo;
+  fetchStatus();
+  pollTimer = setInterval(fetchStatus, 2000);
+}
+
+function stopPolling() {
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+}
+
+async function fetchStatus() {
+  try {
+    const res = await fetch(`${API_BASE}/status/${currentTicketNo}`);
+    const result = await res.json();
+    if (result.code === 200) {
+      renderStatus(result.data);
+      const s = parseInt(result.data.status);
+      if (s === 4 || s === 5 || s === 6) stopPolling();
+    } else {
+      renderEmpty(result.message || '查询失败');
+    }
+  } catch (err) {
+    renderEmpty('无法连接后端服务：' + err.message);
+  }
+}
+
+// ========== 渲染状态 ==========
+function renderStatus(data) {
+  const el = document.getElementById('trackResult');
+  const status = parseInt(data.status);
+  const statusClass = 'status-' + status;
+
+  let html = `
+    <div style="margin-bottom:16px;">
+      <div style="font-size:13px;color:#8D6E63;margin-bottom:6px;">工单号</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:12px;color:#5D4037;">${escapeHtml(data.ticketNo || currentTicketNo)}</div>
+      <span class="status-tag ${statusClass}">${escapeHtml(data.statusDesc || '')}</span>
+      <span style="margin-left:12px;font-size:12px;color:#A1887F;">更新于 ${formatTime(data.updatedAt)}</span>
+    </div>
+  `;
+
+  if (status === 1) {
+    html += `<div class="empty-state"><div class="icon">📋</div><p>工单已提交，排队等待 AI 分析...</p></div>`;
+  }
+  else if (status === 2) {
+    html += `<div class="empty-state"><div class="loading"></div><p>AI 正在分析工单内容，请稍候...</p></div>`;
+  }
+  else if (status === 3) {
+    html += renderAiResult(data);
+  }
+  else if (status === 4) {
+    html += `
+      <div class="detail-section">
+        <h4>✅ 最终解决方案</h4>
+        <div class="solution-box">${escapeHtml(data.solution || '已完成')}</div>
+      </div>
+    `;
+  }
+  else if (status === 6) {
+    html += `
+      <div class="detail-section">
+        <h4>❌ 错误信息</h4>
+        <div class="error-box">${escapeHtml(data.error || '处理失败')}</div>
+        <div style="margin-top:12px;">
+          <button class="btn btn-default" onclick="queryTicket()">重新查询</button>
+        </div>
+      </div>
+    `;
+  }
+
+  el.innerHTML = html;
+}
+
+function renderAiResult(data) {
+  const confidence = parseFloat(data.confidence || 0);
+  const confidencePct = (confidence * 100).toFixed(1);
+  let optionsHtml = '';
+
+  let options = [];
+  try {
+    if (typeof data.options === 'string') {
+      options = JSON.parse(data.options);
+    } else if (Array.isArray(data.options)) {
+      options = data.options;
+    }
+  } catch(e) {
+    options = [{ title: data.options || data.suggested || '推荐方案' }];
+  }
+
+  if (options.length === 0) {
+    options = [{ title: data.suggested || '推荐方案' }];
+  }
+
+  options.forEach((opt, i) => {
+    const title = typeof opt === 'string' ? opt : (opt.title || opt.name || JSON.stringify(opt));
+    const desc = typeof opt === 'object' ? (opt.description || opt.desc || '') : '';
+    optionsHtml += `
+      <div class="option-item" onclick="selectOption(this, '${escapeHtml(title).replace(/'/g, "\\'")}')">
+        <div class="option-title">方案 ${i + 1}：${escapeHtml(title)}</div>
+        ${desc ? `<div class="option-desc">${escapeHtml(desc)}</div>` : ''}
+      </div>
+    `;
+  });
+
+  return `
+    <div class="ai-section">
+      <div class="ai-row">
+        <div class="label">🏷️ AI 分类</div>
+        <div class="value"><b>${escapeHtml(data.category || '未知')}</b></div>
+      </div>
+      <div class="ai-row">
+        <div class="label">📊 置信度</div>
+        <div class="value">
+          <span class="confidence-bar">
+            <span class="confidence-fill" style="width:${confidencePct}%"></span>
+          </span>
+          ${confidencePct}%
+        </div>
+      </div>
+      ${data.summary ? `
+      <div class="ai-row">
+        <div class="label">📝 AI 摘要</div>
+        <div class="value">${escapeHtml(data.summary)}</div>
+      </div>` : ''}
+    </div>
+
+    <div class="detail-section">
+      <h4>👆 请选择处理方案</h4>
+      ${optionsHtml}
+      <div style="margin-top:16px;">
+        <button class="btn btn-success" id="confirmBtn" disabled onclick="confirmTicket()">✅ 确认提交</button>
+      </div>
+    </div>
+  `;
+}
+
+let selectedOption = '';
+function selectOption(el, title) {
+  document.querySelectorAll('.option-item').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedOption = title;
+  document.getElementById('confirmBtn').disabled = false;
+}
+
+async function confirmTicket() {
+  if (!selectedOption) { alert('请先选择一个方案'); return; }
+  const operator = prompt('请输入操作人名称：', 'user001') || 'user001';
+  try {
+    const res = await fetch(`${API_BASE}/confirm/${currentTicketNo}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ decision: selectedOption, operator: operator })
+    });
+    const result = await res.json();
+    if (result.code === 200) {
+      alert('工单已确认完成！');
+      fetchStatus();
+    } else {
+      alert('确认失败：' + result.message);
+    }
+  } catch (err) {
+    alert('网络错误：' + err.message);
+  }
+}
+
+function renderEmpty(msg) {
+  document.getElementById('trackResult').innerHTML = `
+    <div class="empty-state">
+      <div class="icon">🔍</div>
+      <p>${escapeHtml(msg)}</p>
+    </div>
+  `;
+}
+
+// ========== 工具函数 ==========
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function formatTime(t) {
+  if (!t) return '';
+  return String(t).replace('T', ' ').substring(0, 19);
+}
+</script>
+
+</body>
+</html>

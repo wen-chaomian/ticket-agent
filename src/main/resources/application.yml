@@ -1,0 +1,21 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ticket_db?useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: '000000'
+  data:
+    redis:
+      host: 192.168.217.130
+      port: 6379
+
+
+rocketmq:
+  name-server: 192.168.217.130:9876
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
