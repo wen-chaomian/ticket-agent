@@ -1,0 +1,65 @@
+[
+    {
+        "id": 1,
+        "title": "电脑连不上WiFi",
+        "description": "5楼办公区连不上公司WiFi，手机能连",
+        "category": "网络问题",
+        "solution": "重启5楼AP设备，网络已恢复"
+    },
+    {
+        "id": 2,
+        "title": "WiFi频繁掉线",
+        "description": "3楼WiFi信号不稳定，经常断开",
+        "category": "网络问题",
+        "solution": "调整AP信道，减少干扰"
+    },
+    {
+        "id": 3,
+        "title": "VPN连接失败",
+        "description": "在家办公连不上公司VPN",
+        "category": "网络问题",
+        "solution": "检查VPN账号权限，重新配置客户端"
+    },
+    {
+        "id": 4,
+        "title": "邮箱密码错误",
+        "description": "输入正确密码但登录失败",
+        "category": "账号问题",
+        "solution": "重置AD域密码，同步到邮箱系统"
+    },
+    {
+        "id": 5,
+        "title": "新员工账号创建",
+        "description": "需要为新员工创建公司账号",
+        "category": "账号问题",
+        "solution": "在AD域创建账号，分配权限"
+    },
+    {
+        "id": 6,
+        "title": "电脑蓝屏无法开机",
+        "description": "开机后蓝屏，显示系统错误",
+        "category": "设备故障",
+        "solution": "进入安全模式，卸载最近安装的驱动"
+    },
+    {
+        "id": 7,
+        "title": "打印机无法打印",
+        "description": "点击打印没反应，显示脱机",
+        "category": "设备故障",
+        "solution": "重启打印机，重新添加网络打印机"
+    },
+    {
+        "id": 8,
+        "title": "请假审批流程",
+        "description": "提交请假申请后迟迟未审批",
+        "category": "人事审批",
+        "solution": "已手动催促审批人完成审批"
+    },
+    {
+        "id": 9,
+        "title": "出差报销申请",
+        "description": "出差费用报销单被退回，需重新提交",
+        "category": "人事审批",
+        "solution": "补充发票信息后重新提交"
+    }
+]
