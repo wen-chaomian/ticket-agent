@@ -17,7 +17,7 @@ app = FastAPI()
 
 # ============ 配置 ============
 # DeepSeek 配置（和 OpenAI 接口兼容）
-# 从环境变量读取，不要硬编码 API Key
+# 从环境变量读取
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
 DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1")
 
