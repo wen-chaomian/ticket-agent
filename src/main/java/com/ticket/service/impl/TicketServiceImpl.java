@@ -65,7 +65,10 @@ public class TicketServiceImpl extends ServiceImpl<TicketMapper, Ticket> impleme
         log.setOperatorId(operatorId);
         log.setAction(action);
         log.setContent(content);
-        log.setExtra(extra);
+        // extra 字段是 JSON 类型，必须传合法 JSON
+        if (extra != null && !extra.isEmpty()) {
+            log.setExtra("{\"detail\":\"" + extra.replace("\"", "\\\"") + "\"}");
+        }
         log.setCreatedAt(LocalDateTime.now());
         ticketLogMapper.insert(log);
     }
